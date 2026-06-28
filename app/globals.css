@@ -1,0 +1,47 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+    sans-serif;
+  word-break: keep-all; /* 한글 단어 단위 줄바꿈 */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 접근성: 키보드 포커스 표시 */
+:focus-visible {
+  outline: 3px solid #5c84ff;
+  outline-offset: 2px;
+}
+
+/* 모션 최소화 선호 존중 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* 발표 화면 스크롤바를 차분하게 */
+.boardroom ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.boardroom ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
