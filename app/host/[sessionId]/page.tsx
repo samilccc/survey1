@@ -183,7 +183,7 @@ export default function HostPage() {
         <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-8 py-12 lg:grid-cols-2">
           <div>
             <span className="rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/80">
-              세션 대기 중 · 브리핑 후 시작하세요
+              세션 대기 중 · 브리핑이 끝나면 시작하세요
             </span>
             <h1 className="mt-6 text-balance text-4xl font-extrabold leading-tight">
               {session.title}
@@ -209,9 +209,9 @@ export default function HostPage() {
             <button
               onClick={() => act("start")}
               disabled={busy}
-              className="mt-10 rounded-2xl bg-brand-500 px-8 py-4 text-lg font-bold shadow-lg transition hover:bg-brand-600 disabled:opacity-60"
+              className="mt-10 rounded-2xl bg-brand-500 px-10 py-4 text-lg font-bold shadow-lg transition hover:bg-brand-600 disabled:opacity-60"
             >
-              브리핑 후 시작 →
+              시작
             </button>
           </div>
 
@@ -417,24 +417,27 @@ export default function HostPage() {
           <Ctrl onClick={() => act("prev")} disabled={busy || idx === 0}>
             ← 이전
           </Ctrl>
-          {session.is_voting_open ? (
-            <Ctrl onClick={() => act("close_vote")} disabled={busy} variant="warm">
-              투표 닫기
-            </Ctrl>
-          ) : (
-            <Ctrl onClick={() => act("open_vote")} disabled={busy} variant="primary">
-              투표 열기
-            </Ctrl>
-          )}
-          {session.is_result_visible ? (
-            <Ctrl onClick={() => act("hide")} disabled={busy}>
-              결과 숨기기
-            </Ctrl>
-          ) : (
-            <Ctrl onClick={() => act("reveal")} disabled={busy} variant="primary">
-              결과 보기
-            </Ctrl>
-          )}
+          <div className="flex-1" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            {session.is_voting_open ? (
+              <Ctrl onClick={() => act("close_vote")} disabled={busy} variant="warm">
+                투표 닫기
+              </Ctrl>
+            ) : (
+              <Ctrl onClick={() => act("open_vote")} disabled={busy} variant="primary">
+                투표 열기
+              </Ctrl>
+            )}
+            {session.is_result_visible ? (
+              <Ctrl onClick={() => act("hide")} disabled={busy}>
+                결과 숨기기
+              </Ctrl>
+            ) : (
+              <Ctrl onClick={() => act("reveal")} disabled={busy} variant="primary">
+                결과 보기
+              </Ctrl>
+            )}
+          </div>
           <div className="flex-1" />
           {idx >= questions.length - 1 ? (
             <Ctrl
