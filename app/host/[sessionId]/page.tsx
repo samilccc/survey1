@@ -12,20 +12,38 @@ import {
 } from "@/lib/useSurvey";
 import { countResponded } from "@/lib/tally";
 import { buildCsv, buildJson, downloadText } from "@/lib/export";
-import type { Participant, Response } from "@/lib/types";
+import type { Participant, Question, Response } from "@/lib/types";
 import QRDisplay from "@/components/QRDisplay";
-import QuestionImage from "@/components/QuestionImage";
 import ResultChart from "@/components/charts/ResultChart";
 
-function Pill({
-  on,
-  onLabel,
-  offLabel,
-}: {
-  on: boolean;
-  onLabel: string;
-  offLabel: string;
-}) {
+const TYPE_KO: Record<string, string> = {
+  single_choice: "단일 선택",
+  binary: "양자택일",
+  scale: "척도 응답",
+  ranking: "우선순위",
+  free_text: "자유 응답",
+};
+
+// 프레젠테이션 슬라이드에 표시할 핵심 bullet (정답 노출 없이 보기/척도/안내만)
+function slidePoints(q: Question): { marker: string; text: string }[] {
+  if (q.type === "scale") {
+    const min = q.scale?.min ?? 1;
+    const max = q.scale?.max ?? 5;
+    const labels = q.scale?.labels ?? {};
+    const pts: { marker: string; text: string }[] = [];
+    for (let s = min; s <= max; s++) pts.push({ marker: String(s), text: labels[s] ?? `${s}점` });
+    return pts;
+  }
+  if (q.type === "free_text") {
+    return [{ marker: "✎", text: q.free_text_placeholder || "자유롭게 한 줄로 입력해주세요" }];
+  }
+  return q.options.map((o, i) => ({
+    marker: q.type === "ranking" ? "›" : String(i + 1),
+    text: o,
+  }));
+}
+
+function Pill({ on, onLabel, offLabel }: { on: boolean; onLabel: string; offLabel: string }) {
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
@@ -33,9 +51,7 @@ function Pill({
       }`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${
-          on ? "bg-teal animate-pulse-soft" : "bg-white/40"
-        }`}
+        className={`h-1.5 w-1.5 rounded-full ${on ? "bg-teal animate-pulse-soft" : "bg-white/40"}`}
       />
       {on ? onLabel : offLabel}
     </span>
@@ -83,8 +99,21 @@ export default function HostPage() {
 
   const [busy, setBusy] = useState(false);
   const [joinUrl, setJoinUrl] = useState("");
-  const [showNote, setShowNote] = useState(true);
+  const [tools, setTools] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  // "전원 답변 완료" 기준 = 세션 시작 시점의 접속 인원 수(스냅샷)
+  const baselineRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (
+      session?.status === "active" &&
+      baselineRef.current === null &&
+      participants.length > 0
+    ) {
+      baselineRef.current = participants.length;
+    }
+    if (session?.status === "waiting") baselineRef.current = null;
+  }, [session?.status, participants.length]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -107,13 +136,11 @@ export default function HostPage() {
     [sessionId, adminKey]
   );
 
-  // 전체화면
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) rootRef.current?.requestFullscreen?.();
     else document.exitFullscreen?.();
   };
 
-  // 전체 세션 결과 다운로드
   const downloadAll = async (format: "csv" | "json") => {
     const [{ data: allResp }, { data: allPart }] = await Promise.all([
       supabase.from("responses").select("*").eq("session_id", sessionId),
@@ -174,9 +201,7 @@ export default function HostPage() {
               </div>
               <div className="h-12 w-px bg-white/15" />
               <div>
-                <div className="text-5xl font-extrabold tabular-nums">
-                  {questions.length}
-                </div>
+                <div className="text-5xl font-extrabold tabular-nums">{questions.length}</div>
                 <div className="text-sm text-white/60">문항</div>
               </div>
             </div>
@@ -197,9 +222,7 @@ export default function HostPage() {
               <p className="mt-1 break-all rounded-xl bg-white/5 px-4 py-2 font-mono text-sm text-white/80">
                 {joinUrl}
               </p>
-              <p className="mt-3 text-xs text-white/40">
-                로그인 없이 QR 스캔만으로 익명 참여
-              </p>
+              <p className="mt-3 text-xs text-white/40">로그인 없이 QR 스캔만으로 익명 참여</p>
             </div>
           </div>
         </div>
@@ -221,182 +244,176 @@ export default function HostPage() {
     );
   }
 
-  // ===== 진행 화면 =====
+  // ===== 진행 화면 (프레젠테이션 슬라이드) =====
+  const baseline = baselineRef.current ?? connected;
+  const pct = baseline > 0 ? Math.min(100, Math.round((responded / baseline) * 100)) : 0;
+  const allDone = baseline > 0 && responded >= baseline;
+  const points = current ? slidePoints(current) : [];
+
   return (
-    <main ref={rootRef} className="boardroom min-h-screen bg-navy-950 pb-28 text-white">
+    <main ref={rootRef} className="boardroom flex min-h-screen flex-col bg-navy-950 pb-28 text-white">
       {/* 상단 바 */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-navy-950/90 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-3">
-          <div className="flex items-center gap-3">
-            <span className="text-sm font-semibold text-white/50">
-              {session.title}
-            </span>
-          </div>
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3">
+          <span className="truncate text-sm font-semibold text-white/50">{session.title}</span>
           <div className="flex items-center gap-2">
             <Pill on={session.is_voting_open} onLabel="투표 열림" offLabel="투표 닫힘" />
-            <Pill
-              on={session.is_result_visible}
-              onLabel="결과 공개"
-              offLabel="결과 비공개"
-            />
-            <span className="ml-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
-              응답 <b className="text-teal">{responded}</b> / 접속{" "}
-              <b>{connected}</b>
+            <Pill on={session.is_result_visible} onLabel="결과 공개" offLabel="결과 비공개" />
+            <span className="ml-1 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
+              응답 <b className="text-teal">{responded}</b> / {baseline}
             </span>
             <button
+              onClick={() => setTools((v) => !v)}
+              className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/20"
+              title="도구"
+            >
+              ⋯
+            </button>
+            <button
               onClick={toggleFullscreen}
-              className="ml-1 rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/20"
+              className="rounded-lg bg-white/10 px-3 py-1.5 text-xs font-semibold hover:bg-white/20"
               title="전체화면"
             >
               ⛶
             </button>
           </div>
         </div>
-      </header>
-
-      {current && (
-        <div className="mx-auto grid max-w-7xl gap-8 px-6 py-8 lg:grid-cols-3">
-          {/* 메인: 문항 + 결과 */}
-          <section className="lg:col-span-2">
-            <div className="flex items-center gap-3 text-sm font-semibold text-white/50">
-              <span className="rounded-full bg-brand-500/20 px-3 py-1 text-brand-400">
-                문항 {idx + 1} / {questions.length}
-              </span>
-              <span className="uppercase tracking-wider text-white/40">
-                {current.type}
-              </span>
-            </div>
-
-            <QuestionImage
-              order={current.order}
-              title={current.title}
-              imageUrl={current.image_url}
-              className="mt-4 ring-1 ring-white/10"
-            />
-
-            <h2 className="mt-6 text-balance text-3xl font-extrabold leading-snug">
-              {current.title}
-            </h2>
-            {current.short_context && (
-              <p className="mt-3 text-pretty leading-relaxed text-white/65">
-                {current.short_context}
-              </p>
-            )}
-
-            {/* 결과 / 진행 현황 */}
-            <div className="mt-8 rounded-xl2 bg-white/[0.04] p-6 ring-1 ring-white/10">
-              {session.is_result_visible ? (
-                <div className="animate-fade-up">
-                  <ResultChart question={current} responses={responses} dark />
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-10 text-center">
-                  <div className="text-5xl font-extrabold tabular-nums text-teal">
-                    {responded}
-                    <span className="text-2xl text-white/40"> / {connected}</span>
-                  </div>
-                  <p className="mt-2 text-sm text-white/55">
-                    실시간 응답 현황 · 결과는 아직 비공개입니다
-                  </p>
-                  <div className="mt-5 h-2 w-full max-w-md overflow-hidden rounded-full bg-white/10">
-                    <div
-                      className="h-full rounded-full bg-brand-500 transition-all duration-500"
-                      style={{
-                        width: `${
-                          connected ? Math.round((responded / connected) * 100) : 0
-                        }%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* 사이드: 진행자 노트 / 토론 질문 / 해석 */}
-          <aside className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-white/40">
-                진행자 패널
-              </h3>
+        {/* 보조 도구 (접힘) */}
+        {tools && current && (
+          <div className="border-t border-white/10 bg-navy-900/95">
+            <div className="mx-auto flex max-w-6xl flex-wrap gap-2 px-6 py-3">
               <button
-                onClick={() => setShowNote((v) => !v)}
-                className="text-xs text-white/40 hover:text-white/70"
+                onClick={() =>
+                  confirm("이 문항의 응답을 모두 초기화할까요?") &&
+                  act("reset_responses", { questionId: current.id })
+                }
+                className="rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20"
               >
-                {showNote ? "접기" : "펼치기"}
+                응답 초기화
+              </button>
+              <button
+                onClick={() => act("set_edit", { value: !session.allow_response_edit })}
+                className={`rounded-xl px-3 py-2 text-xs font-semibold ${
+                  session.allow_response_edit ? "bg-teal/20 text-teal" : "bg-white/10 hover:bg-white/20"
+                }`}
+              >
+                제출 후 수정 {session.allow_response_edit ? "허용" : "불가"}
+              </button>
+              <button
+                onClick={() => downloadAll("csv")}
+                className="rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20"
+              >
+                CSV
+              </button>
+              <button
+                onClick={() => downloadAll("json")}
+                className="rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20"
+              >
+                JSON
+              </button>
+              <button
+                onClick={() =>
+                  confirm("세션을 종료하고 요약 화면으로 이동할까요?") && act("end")
+                }
+                className="rounded-xl bg-coral/20 px-3 py-2 text-xs font-semibold text-coral hover:bg-coral/30"
+              >
+                세션 종료
               </button>
             </div>
+          </div>
+        )}
+      </header>
 
-            {showNote && (
-              <>
-                <Panel title="진행자 노트" accent="teal">
-                  {current.facilitator_note}
-                </Panel>
-                <Panel title="토론 질문" accent="gold">
-                  {current.discussion_prompt}
-                </Panel>
-                {session.is_result_visible && current.result_interpretation && (
-                  <Panel title="결과 해석" accent="coral">
-                    {current.result_interpretation}
-                  </Panel>
+      {/* 슬라이드 본문 */}
+      {current && (
+        <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 py-8">
+          <div className="flex items-center justify-center gap-3 text-sm font-semibold">
+            <span className="rounded-full bg-brand-500/20 px-3 py-1 text-brand-400">
+              문항 {idx + 1} / {questions.length}
+            </span>
+            <span className="uppercase tracking-wider text-white/40">
+              {TYPE_KO[current.type] ?? current.type}
+            </span>
+          </div>
+
+          <h2 className="mt-5 text-balance text-center text-4xl font-extrabold leading-tight md:text-5xl">
+            {current.title}
+          </h2>
+          {current.short_context && (
+            <p className="mx-auto mt-4 max-w-3xl text-pretty text-center text-lg leading-relaxed text-white/60">
+              {current.short_context}
+            </p>
+          )}
+
+          {!session.is_result_visible ? (
+            <div className="mt-10 grid items-start gap-7 lg:grid-cols-5">
+              {/* 핵심 bullet */}
+              <ul className="space-y-3 lg:col-span-3">
+                {points.map((p, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center gap-4 rounded-2xl bg-white/[0.04] px-5 py-4 ring-1 ring-white/10"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-base font-extrabold text-brand-400">
+                      {p.marker}
+                    </span>
+                    <span className="break-keep text-xl font-semibold leading-snug">{p.text}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* 실시간 참여 현황 */}
+              <div className="rounded-xl2 bg-white/[0.04] p-6 text-center ring-1 ring-white/10 lg:col-span-2">
+                {allDone ? (
+                  <div className="animate-grow-in py-2">
+                    <div className="text-4xl">🎉</div>
+                    <div className="mt-3 text-2xl font-extrabold text-teal">
+                      팀원 전원 답변 완료!
+                    </div>
+                    <div className="mt-1.5 text-sm text-white/60">
+                      {baseline}명 모두 참여했어요
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-sm font-semibold text-white/50">실시간 참여 현황</div>
+                    <div className="mt-3 text-6xl font-extrabold tabular-nums text-teal">
+                      {responded}
+                      <span className="text-3xl text-white/35"> / {baseline}</span>
+                    </div>
+                    <div className="mt-1 text-sm text-white/50">{pct}% 응답</div>
+                    <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className="h-full rounded-full bg-brand-500 transition-all duration-500"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <div className="mt-4 text-xs text-white/40">
+                      {session.is_voting_open
+                        ? "투표가 열려 있어요"
+                        : "‘투표 열기’를 누르면 참여가 시작됩니다"}
+                    </div>
+                  </>
                 )}
-              </>
-            )}
-
-            {/* 보조 컨트롤 */}
-            <div className="rounded-xl2 bg-white/[0.04] p-4 ring-1 ring-white/10">
-              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-white/40">
-                보조 컨트롤
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() =>
-                    confirm("이 문항의 응답을 모두 초기화할까요?") &&
-                    act("reset_responses", { questionId: current.id })
-                  }
-                  className="rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20"
-                >
-                  응답 초기화
-                </button>
-                <button
-                  onClick={() => act("set_edit", { value: !session.allow_response_edit })}
-                  className={`rounded-xl px-3 py-2 text-xs font-semibold ${
-                    session.allow_response_edit
-                      ? "bg-teal/20 text-teal"
-                      : "bg-white/10 hover:bg-white/20"
-                  }`}
-                >
-                  제출 후 수정 {session.allow_response_edit ? "허용" : "불가"}
-                </button>
-                <button
-                  onClick={() => downloadAll("csv")}
-                  className="rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20"
-                >
-                  CSV
-                </button>
-                <button
-                  onClick={() => downloadAll("json")}
-                  className="rounded-xl bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20"
-                >
-                  JSON
-                </button>
-                <button
-                  onClick={() =>
-                    confirm("세션을 종료하고 요약 화면으로 이동할까요?") && act("end")
-                  }
-                  className="rounded-xl bg-coral/20 px-3 py-2 text-xs font-semibold text-coral hover:bg-coral/30"
-                >
-                  세션 종료
-                </button>
               </div>
             </div>
-          </aside>
-        </div>
+          ) : (
+            <div className="mt-10 animate-fade-up">
+              <p className="mb-4 text-center text-sm font-bold uppercase tracking-wider text-white/45">
+                팀원들이 선택한 답변
+              </p>
+              <div className="rounded-xl2 bg-white/[0.04] p-6 ring-1 ring-white/10 md:p-8">
+                <ResultChart question={current} responses={responses} dark />
+              </div>
+              <p className="mt-3 text-center text-xs text-white/40">총 {responded}명 응답</p>
+            </div>
+          )}
+        </section>
       )}
 
       {/* 하단 진행 컨트롤 바 */}
       <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/10 bg-navy-900/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center gap-2 px-6 py-3 sm:gap-3">
+        <div className="mx-auto flex max-w-6xl items-center gap-2 px-6 py-3 sm:gap-3">
           <Ctrl onClick={() => act("prev")} disabled={busy || idx === 0}>
             ← 이전
           </Ctrl>
@@ -415,51 +432,28 @@ export default function HostPage() {
             </Ctrl>
           ) : (
             <Ctrl onClick={() => act("reveal")} disabled={busy} variant="primary">
-              결과 공개
+              결과 보기
             </Ctrl>
           )}
           <div className="flex-1" />
-          <Ctrl
-            onClick={() => act("next")}
-            disabled={busy || idx >= questions.length - 1}
-            variant="primary"
-          >
-            다음 문항 →
-          </Ctrl>
+          {idx >= questions.length - 1 ? (
+            <Ctrl
+              onClick={() =>
+                confirm("세션을 마치고 참여자에게 결과 요약을 보여줄까요?") && act("end")
+              }
+              disabled={busy}
+              variant="warm"
+            >
+              마치기 ✓
+            </Ctrl>
+          ) : (
+            <Ctrl onClick={() => act("next")} disabled={busy} variant="primary">
+              다음 문항 →
+            </Ctrl>
+          )}
         </div>
       </footer>
     </main>
-  );
-}
-
-function Panel({
-  title,
-  accent,
-  children,
-}: {
-  title: string;
-  accent: "teal" | "gold" | "coral";
-  children: React.ReactNode;
-}) {
-  const border = {
-    teal: "border-teal",
-    gold: "border-gold",
-    coral: "border-coral",
-  }[accent];
-  const text = {
-    teal: "text-teal",
-    gold: "text-gold",
-    coral: "text-coral",
-  }[accent];
-  return (
-    <div
-      className={`rounded-xl2 border-l-4 ${border} bg-white/[0.04] p-4 ring-1 ring-white/10`}
-    >
-      <p className={`mb-1.5 text-xs font-bold uppercase tracking-wider ${text}`}>
-        {title}
-      </p>
-      <p className="text-pretty text-sm leading-relaxed text-white/85">{children}</p>
-    </div>
   );
 }
 
@@ -534,13 +528,8 @@ function SummaryView({
           {questions.map((q) => {
             const qResp = allResponses.filter((r) => r.question_id === q.id);
             return (
-              <div
-                key={q.id}
-                className="rounded-xl2 bg-white/[0.04] p-6 ring-1 ring-white/10"
-              >
-                <div className="mb-1 text-sm font-semibold text-brand-400">
-                  문항 {q.order}
-                </div>
+              <div key={q.id} className="rounded-xl2 bg-white/[0.04] p-6 ring-1 ring-white/10">
+                <div className="mb-1 text-sm font-semibold text-brand-400">문항 {q.order}</div>
                 <h2 className="mb-5 text-xl font-bold">{q.title}</h2>
                 <ResultChart question={q} responses={qResp} dark />
                 {q.result_interpretation && (
