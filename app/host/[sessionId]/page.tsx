@@ -10,7 +10,7 @@ import {
   useResponses,
   useSession,
 } from "@/lib/useSurvey";
-import { countResponded } from "@/lib/tally";
+import { countResponded, tallyChoice, tallyScale, tallyRanking, tallyFreeText } from "@/lib/tally";
 import { buildCsv, buildJson, downloadText } from "@/lib/export";
 import type { Participant, Question, Response } from "@/lib/types";
 import QRDisplay from "@/components/QRDisplay";
@@ -465,7 +465,46 @@ function Center({ children }: { children: React.ReactNode }) {
   );
 }
 
-// ===== 종료 후 전체 결과 요약 =====
+// ===== 종료 후 전체 결과 요약 (한 눈에 보이는 대시보드) =====
+function summaryHeadline(
+  q: import("@/lib/types").Question,
+  responses: Response[]
+): { top: string; sub: string } {
+  if (q.type === "single_choice" || q.type === "binary") {
+    const t = tallyChoice(q, responses);
+    if (t.totalResponses === 0) return { top: "응답 없음", sub: "" };
+    let top = 0;
+    t.counts.forEach((c, i) => {
+      if (c > t.counts[top]) top = i;
+    });
+    return { top: q.options[top] ?? "—", sub: `${t.percentages[top]}% · ${t.counts[top]}명` };
+  }
+  if (q.type === "scale") {
+    const t = tallyScale(q, responses);
+    if (t.totalResponses === 0) return { top: "응답 없음", sub: "" };
+    let best = t.distribution[0];
+    for (const d of t.distribution) if (d.count > (best?.count ?? 0)) best = d;
+    const label = q.scale?.labels?.[best.score] ?? `${best.score}점`;
+    return { top: label, sub: `평균 ${t.average.toFixed(1)} · ${t.totalResponses}명` };
+  }
+  if (q.type === "ranking") {
+    const t = tallyRanking(q, responses);
+    if (t.totalResponses === 0) return { top: "응답 없음", sub: "" };
+    const first = t.ranked[0];
+    return {
+      top: q.options[first.optionIndex] ?? "—",
+      sub: `1순위 ${first.firstPlace}회 · ${t.totalResponses}명`,
+    };
+  }
+  // free_text
+  const t = tallyFreeText(responses);
+  if (t.totalResponses === 0) return { top: "응답 없음", sub: "" };
+  const w = t.wordFreq[0];
+  return w
+    ? { top: `“${w.word}”`, sub: `${w.count}회 · 응답 ${t.totalResponses}건` }
+    : { top: `응답 ${t.totalResponses}건`, sub: "자유 응답" };
+}
+
 function SummaryView({
   sessionId,
   title,
@@ -482,6 +521,7 @@ function SummaryView({
   onReopen: () => void;
 }) {
   const [allResponses, setAllResponses] = useState<Response[]>([]);
+  const [detail, setDetail] = useState(false);
 
   useEffect(() => {
     supabase
@@ -492,55 +532,92 @@ function SummaryView({
   }, [sessionId]);
 
   return (
-    <main className="boardroom min-h-screen bg-navy-950 pb-20 text-white">
-      <div className="mx-auto max-w-5xl px-6 py-12">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <span className="rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/70">
-              세션 종료 · 전체 결과 요약
+    <main className="boardroom flex min-h-screen flex-col bg-navy-950 text-white">
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-6 py-6">
+        {/* 헤더 */}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="min-w-0">
+            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/70">
+              세션 종료 · 전체 요약
             </span>
-            <h1 className="mt-4 text-3xl font-extrabold">{title}</h1>
-            <p className="mt-2 text-white/60">참여자 {connected}명</p>
+            <h1 className="mt-2 truncate text-2xl font-extrabold">{title}</h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-white/10 px-3 py-1.5 text-sm font-semibold">
+              참여 <b className="text-teal">{connected}</b>명
+            </span>
+            <button
+              onClick={() => setDetail((v) => !v)}
+              className="rounded-xl bg-white/10 px-3 py-2 text-xs font-bold hover:bg-white/20"
+            >
+              {detail ? "요약만 보기" : "문항별 상세"}
+            </button>
             <button
               onClick={() => onDownload("csv")}
-              className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-bold hover:bg-white/20"
+              className="rounded-xl bg-white/10 px-3 py-2 text-xs font-bold hover:bg-white/20"
             >
-              CSV 다운로드
+              CSV
             </button>
             <button
               onClick={() => onDownload("json")}
-              className="rounded-2xl bg-white/10 px-4 py-2.5 text-sm font-bold hover:bg-white/20"
+              className="rounded-xl bg-white/10 px-3 py-2 text-xs font-bold hover:bg-white/20"
             >
-              JSON 다운로드
+              JSON
             </button>
             <button
               onClick={onReopen}
-              className="rounded-2xl bg-brand-500 px-4 py-2.5 text-sm font-bold hover:bg-brand-600"
+              className="rounded-xl bg-brand-500 px-3 py-2 text-xs font-bold hover:bg-brand-600"
             >
               다시 진행
             </button>
           </div>
         </div>
 
-        <div className="mt-10 space-y-10">
+        {/* 한 눈에 보이는 요약 그리드 */}
+        <div className="mt-5 grid flex-1 auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {questions.map((q) => {
             const qResp = allResponses.filter((r) => r.question_id === q.id);
+            const h = summaryHeadline(q, qResp);
             return (
-              <div key={q.id} className="rounded-xl2 bg-white/[0.04] p-6 ring-1 ring-white/10">
-                <div className="mb-1 text-sm font-semibold text-brand-400">문항 {q.order}</div>
-                <h2 className="mb-5 text-xl font-bold">{q.title}</h2>
-                <ResultChart question={q} responses={qResp} dark />
-                {q.result_interpretation && (
-                  <p className="mt-5 rounded-xl border-l-4 border-coral bg-white/[0.04] p-4 text-sm leading-relaxed text-white/80">
-                    {q.result_interpretation}
-                  </p>
-                )}
+              <div
+                key={q.id}
+                className="flex flex-col rounded-xl2 bg-white/[0.05] p-4 ring-1 ring-white/10"
+              >
+                <div className="text-xs font-bold text-brand-400">문항 {q.order}</div>
+                <p className="mt-1 line-clamp-2 text-[13px] font-semibold leading-snug text-white/70">
+                  {q.title}
+                </p>
+                <div className="mt-auto pt-3">
+                  <div className="break-keep text-lg font-extrabold leading-tight text-teal">
+                    {h.top}
+                  </div>
+                  {h.sub && <div className="mt-1 text-xs text-white/55">{h.sub}</div>}
+                </div>
               </div>
             );
           })}
         </div>
+
+        {/* 문항별 상세 (토글) */}
+        {detail && (
+          <div className="mt-8 space-y-8 border-t border-white/10 pt-8">
+            {questions.map((q) => {
+              const qResp = allResponses.filter((r) => r.question_id === q.id);
+              return (
+                <div key={q.id} className="rounded-xl2 bg-white/[0.04] p-6 ring-1 ring-white/10">
+                  <div className="mb-1 text-sm font-semibold text-brand-400">문항 {q.order}</div>
+                  <h2 className="mb-5 text-xl font-bold">{q.title}</h2>
+                  <ResultChart question={q} responses={qResp} dark />
+                  {q.result_interpretation && (
+                    <p className="mt-5 rounded-xl border-l-4 border-coral bg-white/[0.04] p-4 text-sm leading-relaxed text-white/80">
+                      {q.result_interpretation}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </main>
   );

@@ -216,7 +216,7 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
   },
   {
     order: 9,
-    title: "이 이슈가 부모 직원에게만 해당된다고 생각하시나요?",
+    title: "출산·육아 지원은 부모 직원에게만 해당되는 이슈일까요?",
     short_context:
       "출산·육아 복지를 특정 집단의 복지로 볼지, 조직 전체의 운영 과제로 볼지 확인합니다.",
     type: "scale",

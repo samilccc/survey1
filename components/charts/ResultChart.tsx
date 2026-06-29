@@ -69,11 +69,13 @@ function ChoiceResult({
   tally: ChoiceTally;
   dark: boolean;
 }) {
-  const data = q.options.map((opt, i) => ({
-    label: opt,
-    value: tally.counts[i],
-    sub: `${tally.counts[i]}명 · ${tally.percentages[i]}%`,
-  }));
+  const data = q.options
+    .map((opt, i) => ({
+      label: opt,
+      value: tally.counts[i],
+      sub: `${tally.counts[i]}명 · ${tally.percentages[i]}%`,
+    }))
+    .sort((a, b) => b.value - a.value);
   return <HBars data={data} dark={dark} />;
 }
 
@@ -134,11 +136,13 @@ function ScaleResult({
 }) {
   const t = tallyScale(q, responses);
   const labels = q.scale?.labels ?? {};
-  const data = t.distribution.map((d) => ({
-    label: `${d.score}. ${labels[d.score] ?? ""}`.trim(),
-    value: d.count,
-    sub: `${d.count}명`,
-  }));
+  const data = t.distribution
+    .map((d) => ({
+      label: `${d.score}. ${labels[d.score] ?? ""}`.trim(),
+      value: d.count,
+      sub: `${d.count}명`,
+    }))
+    .sort((a, b) => b.value - a.value);
   return (
     <div className="space-y-6">
       <div className="flex items-end gap-4">
