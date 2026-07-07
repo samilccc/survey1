@@ -122,7 +122,7 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
   },
   {
     order: 5,
-    title: "업데이트가 없는 주가 잦다면, 수요 현황공유는 어떻게 하면 좋을까요?",
+    title: "업데이트 없는 주가 잦다면, 수요 현황공유는 어떻게 하면 좋을까요?",
     short_context:
       "‘유지’와 ‘변화’를 모두 선택지에 담았습니다. 편하게 느껴지는 쪽을 고르시면 됩니다.",
     type: "single_choice",

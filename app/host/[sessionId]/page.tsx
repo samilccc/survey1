@@ -598,7 +598,7 @@ function SummaryView({
         </div>
 
         {/* 한 눈에 보이는 요약 그리드 */}
-        <div className="mt-5 grid flex-1 auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {questions.map((q) => {
             const qResp = allResponses.filter((r) => r.question_id === q.id);
             const h = summaryHeadline(q, qResp);
@@ -608,15 +608,13 @@ function SummaryView({
                 className="flex flex-col rounded-xl2 bg-white/[0.05] p-4 ring-1 ring-white/10"
               >
                 <div className="text-xs font-bold text-brand-400">문항 {q.order}</div>
-                <p className="mt-1 line-clamp-2 text-[13px] font-semibold leading-snug text-white/70">
+                <p className="mt-1 line-clamp-2 text-[13px] font-medium leading-snug text-white/50">
                   {q.title}
                 </p>
-                <div className="mt-auto pt-3">
-                  <div className="break-keep text-lg font-extrabold leading-tight text-teal">
-                    {h.top}
-                  </div>
-                  {h.sub && <div className="mt-1 text-xs text-white/55">{h.sub}</div>}
+                <div className="mt-3.5 break-keep text-2xl font-extrabold leading-tight text-teal">
+                  {h.top}
                 </div>
+                {h.sub && <div className="mt-1.5 text-xs font-medium text-white/55">{h.sub}</div>}
               </div>
             );
           })}
