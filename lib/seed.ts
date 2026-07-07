@@ -1,9 +1,9 @@
 import type { QuestionType, ScaleMeta } from "./types";
 
 // 세션 메타
-export const SESSION_TITLE = "복지일까, 투자일까: 출산·육아 지원의 새로운 의미";
+export const SESSION_TITLE = "우리의 시간, 다시 디자인하다";
 export const SESSION_SUBTITLE =
-  "IT·게임업계의 출산·육아 복지 트렌드를 통해 보는 조직문화와 리텐션의 변화";
+  "미팅과 몰입을 ‘더 적은 부담 · 더 큰 가치’로 — 함께 그리는 실시간 서베이";
 
 // 새 세션 생성 시 DB에 함께 들어가는 문항 템플릿
 // (id / session_id 는 서버에서 생성)
@@ -24,241 +24,263 @@ export interface SeedQuestion {
 export const SEED_QUESTIONS: SeedQuestion[] = [
   {
     order: 1,
-    title: "이 주제, 여러분은 어디에서부터 보이나요?",
+    title: "지금 우리 팀 미팅의 ‘양’, 나에게는 어떻게 느껴지나요?",
     short_context:
-      "방금 브리핑을 들은 직후, 출산·육아 복지를 어떤 관점에서 가장 먼저 바라보는지 확인합니다.",
-    type: "single_choice",
-    options: [
-      "직원 개인을 위한 복리후생",
-      "핵심 인재를 지키기 위한 리텐션 전략",
-      "좋은 회사를 보여주는 채용 브랜딩",
-      "기업이 감당해야 할 사회적 책임",
-      "아직은 비용 부담이 더 크게 느껴진다",
-    ],
-    scale: null,
+      "좋고 나쁨을 가리는 게 아니라, 지금 우리 팀의 리듬을 솔직하게 재보는 온도계입니다.",
+    type: "scale",
+    options: [],
+    scale: {
+      min: 1,
+      max: 5,
+      labels: {
+        1: "너무 적다",
+        2: "조금 적다",
+        3: "딱 적당하다",
+        4: "조금 많다",
+        5: "너무 많다",
+      },
+    },
     free_text_placeholder: null,
     image_prompt:
-      "A modern Korean office seminar scene, diverse employees looking at a large screen with the question \u201Cwelfare or investment\u201D represented by abstract icons, warm professional atmosphere, corporate insight session, pastel and deep blue color palette, 16:9, no logos, no real faces, refined editorial illustration style",
+      "A bright cheerful editorial illustration of a friendly analog gauge or dial measuring team rhythm, soft sky blue and mint gradient background, warm sunny yellow accent, light and optimistic mood, flat modern vector style, 16:9, no text, no logos, no faces",
     facilitator_note:
-      "첫 문항은 정답을 묻는 것이 아니라 관점의 출발점을 확인하기 위한 질문입니다. 결과가 갈릴수록 좋은 대화가 만들어집니다.",
+      "첫 문항은 분위기를 여는 온도계입니다. 정답이 없고, 평균과 분포로 우리 팀의 현재 체감을 가볍게 함께 봅니다.",
     discussion_prompt:
-      "같은 제도를 보고도 어떤 사람은 복지로, 어떤 사람은 투자로, 어떤 사람은 비용으로 봅니다. 왜 이런 차이가 생긴다고 생각하시나요?",
+      "같은 팀인데도 ‘적당하다’와 ‘많다’가 갈린다면, 그 차이는 어디서 올까요? (역할·파트·업무 성격 등)",
     result_interpretation:
-      "복리후생 응답이 많으면 구성원 경험 중심의 인식이 강합니다. 리텐션 응답이 많으면 인재 전략 관점이 이미 공유되어 있습니다. 사회적 책임 응답이 많으면 조직의 역할을 넓게 보는 문화가 있습니다. 비용 부담 응답이 많으면 실행 가능성과 형평성 논의가 필요합니다.",
+      "평균이 3에 가까우면 대체로 균형 잡혀 있다는 신호입니다. 4~5로 치우치면 미팅 양이 부담으로 느껴진다는 공통 감각이 있는 것이고, 분포가 넓으면 역할·파트별로 체감이 크게 다르다는 뜻입니다.",
   },
   {
     order: 2,
-    title: "가장 강력하게 마음을 움직이는 지원은 무엇인가요?",
+    title: "미팅 시간을 더 값지게 쓸 수 있다면, 가장 개선하고 싶은 건?",
     short_context:
-      "크래프톤의 1억 원 지원 사례처럼 경제적 지원이 주목받지만, 실제 체감 가치는 사람마다 다를 수 있습니다.",
+      "무엇을 ‘줄이자’가 아니라, 무엇을 ‘더 낫게’ 만들지 고르는 질문입니다.",
     type: "single_choice",
     options: [
-      "출산·육아 관련 현금 지원",
-      "육아휴직 기간 확대",
-      "재택근무·유연근무",
-      "어린이집·돌봄 인프라",
-      "복귀 후 평가·승진 불이익 방지",
+      "횟수(빈도)",
+      "길이(소요 시간)",
+      "목적·안건의 명확성",
+      "준비와 후속 정리",
+      "지금도 충분히 좋아요",
     ],
     scale: null,
     free_text_placeholder: null,
     image_prompt:
-      "A balanced scale in a modern office, one side showing financial support icons, the other side showing time, childcare, flexibility, and fair evaluation icons, Korean workplace context, thoughtful employees in discussion, sophisticated corporate illustration, warm but professional, 16:9, no logos",
+      "A bright optimistic illustration of a hand polishing a glowing calendar block until it sparkles, upgrade and improvement theme, sky blue and soft coral gradient, sunny highlights, cheerful flat vector style, 16:9, no text, no logos, no faces",
     facilitator_note:
-      "이 문항은 \u201C돈이냐 시간이냐 문화냐\u201D를 직접 비교하게 만듭니다. 팀원들의 우선순위가 꽤 다르게 나올 가능성이 높습니다.",
+      "‘지금도 충분히 좋아요’를 당당히 고를 수 있게 안내해주세요. 특정 미팅을 지목하지 않고 개선 포인트만 모읍니다.",
     discussion_prompt:
-      "내가 선택한 지원이 가장 중요하다고 느낀 이유는 무엇인가요? 실제로 제도를 사용하는 입장이라면 어떤 지원이 가장 안심이 될까요?",
+      "가장 많이 나온 개선 포인트 하나를, 다음 주부터 당장 시도한다면 어떻게 바꿔볼 수 있을까요?",
     result_interpretation:
-      "현금 지원이 많으면 즉각적이고 명확한 보상에 대한 니즈가 큽니다. 유연근무가 많으면 시간 통제권이 핵심입니다. 평가 불이익 방지가 많으면 제도보다 신뢰의 문제가 큽니다. 돌봄 인프라가 많으면 개인이 해결하기 어려운 현실 지원이 중요합니다.",
+      "횟수·길이에 몰리면 ‘시간의 총량’이, 목적·준비에 몰리면 ‘미팅의 질’이 핵심 이슈입니다. ‘충분히 좋아요’가 많으면 큰 구조 변경보다 미세 조정이 어울립니다.",
   },
   {
     order: 3,
-    title: "\u201C1억 지원\u201D은 실제 출산 결정에 영향을 줄까요?",
+    title: "모두가 함께하는 정기 미팅 중, ‘꼭 지키고 싶은’ 순서대로 놓아주세요.",
     short_context:
-      "강력한 현금 지원이 개인의 삶의 결정에 얼마나 영향을 줄 수 있다고 보는지 확인합니다.",
-    type: "scale",
-    options: [],
-    scale: {
-      min: 1,
-      max: 5,
-      labels: {
-        1: "거의 영향 없다",
-        2: "일부 참고는 된다",
-        3: "어느 정도 영향 있다",
-        4: "꽤 큰 영향이 있다",
-        5: "결정에 매우 큰 영향을 준다",
-      },
-    },
+      "없애고 싶은 걸 고르는 게 아니라, 나에게 가장 소중한 시간부터 지켜보는 질문입니다.",
+    type: "ranking",
+    options: [
+      "트렌드톡 (월, 팀즈)",
+      "수요 현황공유 (대면)",
+      "파트 미팅",
+      "월간 팀스터디",
+    ],
+    scale: null,
     free_text_placeholder: null,
     image_prompt:
-      "A symbolic crossroads illustration in a Korean city-office context, one path showing career continuity and another showing family planning, soft glowing financial support icon in the center, reflective and respectful tone, modern editorial illustration, 16:9, pastel blue and warm neutral palette, no text, no logos",
+      "A bright friendly illustration of four little glowing time-blocks being gently arranged in order of preference, warm mint and sky gradient, sunny yellow star accents, playful and light mood, flat modern vector, 16:9, no text, no logos, no faces",
     facilitator_note:
-      "민감한 주제이므로 개인의 실제 출산 계획을 묻는 것이 아니라, 제도의 영향력에 대한 인식을 묻는 질문임을 강조해주세요.",
+      "순위는 ‘가치의 크기’를 드러냅니다. 하위에 놓였다고 ‘없애자’가 아니라, ‘형태를 바꿔볼 후보’로 부드럽게 해석해주세요.",
     discussion_prompt:
-      "금액이 충분히 크면 삶의 결정을 바꿀 수 있을까요? 아니면 돈보다 더 중요한 조건이 있을까요?",
+      "상위에 놓인 미팅은 무엇을 주기에 소중한가요? 하위 미팅은 그 가치를 다른 방식으로도 채울 수 있을까요?",
     result_interpretation:
-      "평균이 높으면 현금 지원의 상징성과 실질 영향력을 크게 보는 분위기입니다. 평균이 낮으면 출산 결정은 조직 복지만으로 움직이기 어렵다는 인식이 강합니다. 분포가 양극화되면 개인의 생애 단계와 가치관에 따라 인식 차이가 큽니다.",
+      "상위로 모인 미팅은 우리 팀이 아끼는 시간입니다. 하위로 모인 미팅은 ‘형태(주기·길이·방식)’를 먼저 재설계해볼 후보입니다.",
   },
   {
     order: 4,
-    title:
-      "제도가 있어도 사람들이 마음 편히 쓰지 못하는 가장 큰 이유는 무엇일까요?",
+    title: "매주 수요일 대면 현황공유, 나에게 가장 큰 가치는?",
     short_context:
-      "제도와 실제 사용 사이의 간극이 어디에서 생기는지 확인합니다.",
+      "이 미팅의 ‘진짜 가치’가 어디에 있는지 알면, 그 가치는 지키고 나머지는 가볍게 만들 수 있습니다.",
     type: "single_choice",
     options: [
-      "업무 공백을 남긴다는 부담",
-      "동료에게 일이 몰릴 것 같은 미안함",
-      "평가·승진에서 불이익을 받을 것 같은 불안",
-      "리더가 진심으로 지지하지 않을 것 같은 느낌",
-      "복귀 후 내 자리가 애매해질 것 같은 걱정",
+      "서로 얼굴 보고 연결되는 것",
+      "업무 현황을 맞추는 것",
+      "빠르게 논의·결정하는 것",
+      "솔직히 큰 가치를 느끼기 어렵다",
     ],
     scale: null,
     free_text_placeholder: null,
     image_prompt:
-      "A professional office worker standing between an open door labeled opportunity through visual symbols and a shadow of workplace pressure, team desks in the background, subtle emotional tension, respectful Korean corporate culture scene, modern warm illustration, 16:9, no actual text, no logos",
+      "A warm bright illustration of people-shaped abstract figures gathering around a sunny round table, sense of connection and warmth, soft coral and sky gradient, cheerful and inviting, flat modern vector style, 16:9, no text, no logos, no realistic faces",
     facilitator_note:
-      "이 문항은 제도와 실제 사용 사이의 간극을 드러내는 핵심 질문입니다. 결과를 공개한 뒤에는 \u201C그래서 문화가 중요하다\u201D는 메시지로 연결할 수 있습니다.",
+      "이 문항은 미팅을 평가하려는 게 아니라 ‘연결의 가치’와 ‘현황의 가치’를 분리해 보기 위한 것입니다. 솔직한 응답이 재설계의 열쇠입니다.",
     discussion_prompt:
-      "우리 주변에서 제도를 쓰기 어렵게 만드는 신호는 어떤 것들이 있을까요? 말로는 허용되지만 실제로는 부담을 주는 장면은 무엇일까요?",
+      "만약 이 미팅의 핵심 가치가 ‘연결’이라면, 현황 공유는 다른 방식으로 옮겨도 그 연결이 유지될까요?",
     result_interpretation:
-      "업무 공백·동료 부담 응답이 많으면 팀 운영 구조의 문제가 큽니다. 평가 불이익 응답이 많으면 공정성 장치가 중요합니다. 리더 지지 응답이 많으면 관리자 행동이 제도 체감도를 좌우합니다. 복귀 불안 응답이 많으면 리보딩 프로그램이 필요합니다.",
+      "‘연결’에 몰리면 대면의 정서적 가치가 크므로 형태보다 주기 조정이 어울립니다. ‘현황 동기화’에 몰리면 비동기·대시보드로 대체할 여지가 큽니다. ‘가치를 느끼기 어렵다’가 있으면 목적 재정의가 필요합니다.",
   },
   {
     order: 5,
-    title: "육아휴직자의 업무 공백은 누구의 책임에 가장 가까울까요?",
+    title: "업데이트가 없는 주가 잦다면, 수요 현황공유는 어떻게 하면 좋을까요?",
     short_context:
-      "업무 공백을 바라보는 책임의 관점이 사람마다 어떻게 다른지 확인합니다.",
+      "‘유지’와 ‘변화’를 모두 선택지에 담았습니다. 편하게 느껴지는 쪽을 고르시면 됩니다.",
     type: "single_choice",
     options: [
-      "휴직을 사용하는 개인",
-      "팀장 또는 리더",
-      "남아 있는 팀원 전체",
-      "회사의 제도와 운영 시스템",
-      "개인·팀·회사가 함께 나눠야 할 책임",
+      "지금처럼 매주 유지",
+      "격주로 진행",
+      "안건이 있을 때만 (온디맨드)",
+      "30분 이하로 짧게 유지",
     ],
     scale: null,
     free_text_placeholder: null,
     image_prompt:
-      "A round table in a Korean corporate meeting room with empty chair, manager, teammates, and company system represented by abstract connected icons, balanced responsibility theme, inclusive and thoughtful mood, modern editorial illustration, 16:9, no logos",
+      "A bright cheerful illustration of a calendar with some weeks glowing and some resting, flexible rhythm concept, mint and sky blue gradient, sunny yellow accents, light optimistic mood, flat modern vector, 16:9, no text, no logos, no faces",
     facilitator_note:
-      "의견 차이가 크게 날 수 있는 질문입니다. 누가 옳고 그른지 판단하지 말고, 책임을 바라보는 관점이 어떻게 다른지 확인하는 데 집중해주세요.",
+      "이 문항이 이번 세션의 핵심 의사결정 재료입니다. ‘매주 유지’도 당당한 선택지임을 강조해주세요.",
     discussion_prompt:
-      "개인의 생애 이벤트가 팀의 업무 운영에 영향을 줄 때, 조직은 어디까지 책임져야 할까요?",
+      "가장 많이 나온 방식을 4주만 시범 운영해본다면, 무엇을 기준으로 ‘성공’이라고 판단할 수 있을까요?",
     result_interpretation:
-      "개인 응답이 많으면 자기책임 관점이 강합니다. 팀장 응답이 많으면 리더십의 조정 역할을 중시합니다. 회사 시스템 응답이 많으면 구조적 해결을 기대합니다. 공동 책임 응답이 많으면 성숙한 조직문화 논의로 확장하기 좋습니다.",
+      "격주·온디맨드에 몰리면 주기 유연화에 대한 합의가 있는 것입니다. ‘매주 유지’가 많으면 대면의 리듬 자체를 아낀다는 뜻이니, 대신 길이·안건을 손보는 방향이 좋습니다.",
   },
   {
     order: 6,
-    title:
-      "좋은 육아 복지가 리텐션에 영향을 주는 가장 큰 이유는 무엇일까요?",
+    title: "정기 미팅을 대신하거나 보완할 방식 중, 먼저 시도해보고 싶은 건?",
     short_context:
-      "리텐션은 단순한 퇴사 방지가 아니라, 오래 머물 수 있는 이유를 만드는 일입니다.",
+      "정답이 아니라 ‘실험해볼 후보’를 고르는 질문입니다. 하나만 골라주세요.",
     type: "single_choice",
     options: [
-      "경제적 부담을 줄여주기 때문에",
-      "경력 단절 위험을 낮춰주기 때문에",
-      "회사가 나를 책임진다는 신뢰를 주기 때문에",
-      "장기적으로 일할 수 있는 삶의 구조를 만들어주기 때문에",
-      "가족과 커리어를 선택지로 갈라놓지 않기 때문에",
+      "팀 공간에 비동기 업데이트 (글·짧은 영상)",
+      "필요할 때 1:1을 신청하는 공간",
+      "공유 대시보드로 현황 대체",
+      "대면은 월 1회로 몰아서 진하게",
+      "지금 방식이 최선",
     ],
     scale: null,
     free_text_placeholder: null,
     image_prompt:
-      "A long bridge connecting career, family, trust, and future stability in a modern Korean workplace landscape, employees walking confidently across, warm light, strategic HR and retention concept, refined corporate illustration, 16:9, no logos, no real faces",
+      "A bright playful illustration of floating cards and a lightbulb representing async updates and new ideas, sky blue and lilac gradient, sunny sparkles, cheerful innovative mood, flat modern vector style, 16:9, no text, no logos, no faces",
     facilitator_note:
-      "리텐션은 단순히 \u201C퇴사 방지\u201D가 아니라, 장기적으로 머물 수 있는 이유를 만드는 것입니다.",
+      "여기서 나온 상위 대안이 곧 다음 주부터 시범 운영해볼 후보가 됩니다. 팀즈·팀 공간을 이미 쓰는 만큼 실현 가능성이 높습니다.",
     discussion_prompt:
-      "사람이 회사를 오래 다니게 되는 이유는 보상일까요, 신뢰일까요, 삶과 일의 지속 가능성일까요?",
+      "가장 많이 나온 대안을 실제로 도입한다면, 누가·언제·어디에 올리는지 ‘작은 규칙’ 하나를 정한다면 무엇일까요?",
     result_interpretation:
-      "경제적 부담 응답이 많으면 보상 중심 리텐션 관점입니다. 경력 단절 응답이 많으면 커리어 지속성이 핵심입니다. 신뢰 응답이 많으면 조직과 구성원 간 심리적 계약이 중요합니다. 삶의 구조 응답이 많으면 장기적 일하는 방식의 문제로 볼 수 있습니다.",
+      "비동기 업데이트·대시보드에 몰리면 ‘현황 공유는 비동기로’ 합의가 무르익은 것입니다. 1:1 신청 공간이 많으면 정기 미팅보다 ‘필요할 때 연결’을 원한다는 신호입니다.",
   },
   {
     order: 7,
-    title: "우리 조직이 하나만 먼저 바꿀 수 있다면 무엇이 우선일까요?",
+    title: "나는 방해받지 않는 ‘몰입 시간(딥워크)’을 충분히 확보하고 있다.",
     short_context:
-      "모든 것을 한 번에 바꿀 수 없다면, 어디부터 시작하는 것이 가장 효과적인지 우선순위를 정합니다.",
-    type: "ranking",
-    options: [
-      "더 강한 경제적 지원",
-      "더 자유로운 유연근무",
-      "육아휴직·복귀자에 대한 평가 보호",
-      "대체인력·업무 재배분 시스템",
-      "리더 대상 일·가정 양립 교육",
-      "육아 중인 선배 롤모델 가시화",
-    ],
-    scale: null,
-    free_text_placeholder: null,
-    image_prompt:
-      "A strategic priority board in a modern office, sticky notes with abstract icons for money, time, fairness, staffing, leadership, role model, Korean employees arranging priorities together, collaborative and polished illustration, 16:9, no readable text, no logos",
-    facilitator_note:
-      "순위형 문항입니다. 결과는 1순위만 보지 말고 전체 가중 점수로 해석해주세요. 조직이 당장 할 수 있는 일과 장기적으로 필요한 일을 나눠 이야기하면 좋습니다.",
-    discussion_prompt:
-      "가장 먼저 바꿔야 할 것과 가장 오래 걸리지만 중요한 것은 같을까요, 다를까요?",
-    result_interpretation:
-      "유연근무·평가 보호가 상위라면 제도의 실사용성이 핵심입니다. 대체인력·업무 재배분이 상위라면 팀 운영 설계가 병목입니다. 리더 교육이 상위라면 제도보다 리더십 행동 변화가 필요합니다. 롤모델 가시화가 상위라면 문화적 신호와 사례 공유가 중요합니다.",
-  },
-  {
-    order: 8,
-    title: "\u201C좋은 제도\u201D와 \u201C좋은 문화\u201D 중 무엇이 먼저일까요?",
-    short_context: "제도가 문화를 만들까요, 문화가 제도를 작동시킬까요?",
-    type: "binary",
-    options: ["좋은 제도가 먼저다", "좋은 문화가 먼저다"],
-    scale: null,
-    free_text_placeholder: null,
-    image_prompt:
-      "Two abstract pillars in a modern corporate hall, one representing policy and system, the other representing culture and trust, balanced tension, Korean workplace seminar mood, elegant editorial illustration, 16:9, deep blue and warm pastel palette, no logos, no text",
-    facilitator_note:
-      "둘 다 중요하지만 일부러 양자택일하게 만드는 문항입니다. 결과가 갈릴수록 토론이 좋아집니다.",
-    discussion_prompt:
-      "제도가 먼저 있어야 사람들이 안심할까요? 아니면 문화가 준비되어 있어야 제도가 실제로 작동할까요?",
-    result_interpretation:
-      "제도가 많으면 명확한 기준과 장치가 필요하다는 인식입니다. 문화가 많으면 리더십과 팀 분위기가 제도보다 강한 신호라는 인식입니다. 결과가 반반이면 \u201C제도는 최소 조건, 문화는 작동 조건\u201D으로 정리할 수 있습니다.",
-  },
-  {
-    order: 9,
-    title: "출산·육아 지원은 부모 직원에게만 해당되는 이슈일까요?",
-    short_context:
-      "출산·육아 복지를 특정 집단의 복지로 볼지, 조직 전체의 운영 과제로 볼지 확인합니다.",
+      "미팅 이야기에서 잠깐 나에게로 — 요즘 내 집중 시간은 어떤가요?",
     type: "scale",
     options: [],
     scale: {
       min: 1,
       max: 5,
       labels: {
-        1: "거의 부모 직원 개인의 이슈다",
-        2: "주로 당사자 중심 이슈다",
-        3: "당사자와 팀 모두의 이슈다",
-        4: "조직 운영 전반의 이슈다",
-        5: "미래 인재 전략과 사회적 책임의 이슈다",
+        1: "전혀 그렇지 않다",
+        2: "그렇지 않다",
+        3: "보통이다",
+        4: "그렇다",
+        5: "매우 그렇다",
       },
     },
     free_text_placeholder: null,
     image_prompt:
-      "A wide view of a modern Korean office ecosystem, parents, non-parents, managers, HR, and teammates connected by subtle lines, workplace support as shared system, inclusive and strategic mood, modern editorial illustration, 16:9, no logos",
+      "A calm bright illustration of a person-shaped figure inside a cozy glowing focus bubble with headphones, deep work concentration, soft sky and mint gradient, warm sunny light, peaceful optimistic mood, flat modern vector, 16:9, no text, no logos, no realistic faces",
     facilitator_note:
-      "이 문항은 \u201C나와 직접 관련 있는가\u201D를 넘어 \u201C조직 전체에 어떤 의미가 있는가\u201D로 시야를 넓히는 역할을 합니다.",
+      "여기서부터 ‘몰입 시간’ 미니 섹션입니다. 미팅이 부담스러운 진짜 이유가 여기 있는 경우가 많습니다.",
     discussion_prompt:
-      "부모가 아닌 구성원에게도 출산·육아 복지가 중요한 이유가 있을까요?",
+      "평균이 낮다면, 우리는 ‘미팅이 많은’ 걸까요, 아니면 ‘몰입을 지킬 구조가 없는’ 걸까요?",
     result_interpretation:
-      "낮은 점수가 많으면 당사자 중심 복지로 인식됩니다. 중간 점수가 많으면 팀 운영 이슈로 인식됩니다. 높은 점수가 많으면 조직문화·인재전략·사회적 책임으로 확장해 볼 준비가 되어 있습니다.",
+      "평균이 낮으면 몰입 시간 부족이 팀의 공통 페인포인트입니다. 이 경우 미팅 수를 줄이는 것만큼 ‘몰입을 보호하는 규칙’이 효과적입니다.",
+  },
+  {
+    order: 8,
+    title: "내 몰입을 가장 자주 끊는 것은 무엇인가요?",
+    short_context:
+      "몰입을 깨는 ‘범인’을 갈라 보면, 대안이 훨씬 정확해집니다.",
+    type: "single_choice",
+    options: [
+      "예정된 미팅",
+      "갑작스러운 호출·즉석 미팅",
+      "팀즈·메신저 알림",
+      "미팅 사이 애매하게 뜨는 30분",
+      "특별히 없다",
+    ],
+    scale: null,
+    free_text_placeholder: null,
+    image_prompt:
+      "A bright light-hearted illustration of a smooth focus line being interrupted by little friendly notification bells and bubbles, sky blue and coral gradient, sunny accents, playful non-stressful mood, flat modern vector, 16:9, no text, no logos, no faces",
+    facilitator_note:
+      "마이크로소프트 조사에서 직원들은 평균 2분마다 방해받는다고 합니다. ‘범인’이 미팅만은 아닐 수 있어, 이걸 나누면 해법이 정교해집니다.",
+    discussion_prompt:
+      "가장 많이 나온 방해 요인은, 규칙 하나로 줄일 수 있을까요? (예: 알림 시간대, 즉석 호출 자제 시간)",
+    result_interpretation:
+      "‘예정된 미팅’이 많으면 캘린더 재설계가, ‘알림·즉석 호출’이 많으면 커뮤니케이션 규칙이, ‘애매한 30분’이 많으면 미팅을 특정 창구로 모으는 배치가 해법입니다.",
+  },
+  {
+    order: 9,
+    title: "몰입 시간을 지키기 위해, 우리 팀이 함께 시도해볼 만한 것은?",
+    short_context:
+      "곧바로 실천할 수 있는, 우리 모두를 위한 작은 약속을 골라주세요.",
+    type: "single_choice",
+    options: [
+      "요일·시간대 ‘미팅 없는 몰입 블록’ 정하기",
+      "회의를 오전·오후 특정 창구로 모으기",
+      "급하지 않은 건 비동기로 전환",
+      "회의를 25·50분으로 짧게 끝내기",
+      "지금도 충분하다",
+    ],
+    scale: null,
+    free_text_placeholder: null,
+    image_prompt:
+      "A bright uplifting illustration of a protected glowing time-block shielded by a friendly umbrella or shield, focus time protection concept, mint and sky gradient, warm sunny highlights, hopeful mood, flat modern vector, 16:9, no text, no logos, no faces",
+    facilitator_note:
+      "여기 선택지는 실제로 효과가 확인된 방식들입니다. 마이크로소프트 인간공학팀 연구에서 짧은 휴식이 스트레스를 낮추고 집중을 높였고, 그래서 아웃룩·팀즈에도 25·50분 자동 단축 설정이 들어갔습니다.",
+    discussion_prompt:
+      "가장 많이 나온 방식을 ‘이번 주부터’ 우리 팀 규칙으로 만든다면, 첫 문장은 어떻게 시작할까요?",
+    result_interpretation:
+      "몰입 블록·회의 모으기에 몰리면 ‘시간 보호’ 규칙에 대한 지지가 큽니다. 짧게 끝내기가 많으면 총량보다 밀도를 원하는 것이고, ‘충분하다’가 많으면 지금 리듬을 크게 바꿀 필요는 적습니다.",
   },
   {
     order: 10,
-    title: "지금 우리 팀에서 가장 먼저 이야기해보고 싶은 주제는 무엇인가요?",
+    title: "우리 미팅을 다시 디자인한다면, 더 지켜야 할 가치는?",
     short_context:
-      "오늘 주제를 듣고, 우리 팀에서 더 이야기해보고 싶은 키워드나 질문을 짧게 적어주세요.",
+      "둘 다 소중하지만, 지금 우리에게 조금 더 무게가 실리는 쪽은 어디인가요?",
+    type: "binary",
+    options: [
+      "서로 연결·유대 (얼굴 보고 함께)",
+      "효율·몰입 (집중할 시간 확보)",
+    ],
+    scale: null,
+    free_text_placeholder: null,
+    image_prompt:
+      "A bright balanced illustration of a friendly seesaw balancing a warm heart on one side and a glowing focus clock on the other, sky blue and coral gradient, sunny optimistic mood, flat modern vector, 16:9, no text, no logos, no faces",
+    facilitator_note:
+      "정답이 없는 균형 질문입니다. 팽팽히 갈리면 ‘둘 다 지키는 설계’로, 한쪽으로 쏠리면 그게 지금 우리 팀의 우선순위입니다.",
+    discussion_prompt:
+      "연결과 효율을 동시에 잡는 방법이 있을까요? (예: 짧지만 자주 얼굴 보기 / 몰아서 깊게 만나기)",
+    result_interpretation:
+      "‘연결’로 기울면 대면·정서적 시간을 지키되 형태를 가볍게, ‘효율’로 기울면 몰입 보호와 비동기 전환을 우선하는 방향이 팀의 뜻에 맞습니다.",
+  },
+  {
+    order: 11,
+    title: "우리 팀 미팅을 ‘더 적은 부담 + 더 큰 가치’로 만들 나의 아이디어 한 가지는?",
+    short_context:
+      "오늘의 대화를 실제 변화로 잇는, 가장 중요한 한 줄입니다.",
     type: "free_text",
     options: [],
     scale: null,
     free_text_placeholder:
-      "예: 육아휴직자의 업무 공백 / 유연근무의 기준 / 복귀자의 평가 보호 / 동료 부담을 줄이는 방식 / 부모·비부모 형평성 / 제도보다 중요한 리더의 태도",
+      "예: 수요 미팅은 격주로, 대신 팀 공간에 주간 업데이트를 올려요",
     image_prompt:
-      "A calm closing scene of a Korean team meeting, employees sharing thoughts on cards around a table, warm professional lighting, reflective organizational culture workshop, modern inclusive editorial illustration, 16:9, no logos, no readable text",
+      "A bright cheerful illustration of a speech bubble containing a glowing lightbulb, fresh idea and collaboration theme, sky blue and mint gradient, sunny yellow sparkles, hopeful upbeat mood, flat modern vector, 16:9, no text, no logos, no faces",
     facilitator_note:
-      "이 문항은 세션 마지막 회고가 아니라, 이후 팀 대화를 열기 위한 의제 수집용입니다. 결과는 워드클라우드 또는 카드형 목록으로 보여주세요.",
+      "이 응답들이 곧 후속 액션 리스트입니다. 가장 많이 나온 키워드 1~2개를 즉석에서 골라 다음 스텝으로 이어가세요.",
     discussion_prompt:
-      "가장 많이 나온 키워드 1~2개를 골라 바로 짧게 이야기해보세요. \u201C왜 이 주제가 우리 팀에 중요할까?\u201D를 묻는 방식이 좋습니다.",
+      "나온 아이디어 중 ‘다음 주에 당장 해볼 수 있는 것’ 하나를 함께 고른다면?",
     result_interpretation:
-      "반복적으로 등장하는 단어가 현재 팀의 진짜 관심사입니다. 민감한 표현은 익명성을 유지한 채 묶어서 보여주세요. 이 결과는 이후 조직문화 개선 과제나 후속 미팅 의제로 활용할 수 있습니다.",
+      "반복되는 키워드가 팀의 우선 실행 과제입니다. 실현이 쉬운 것부터 하나 정해 4주 시범 운영 → 회고로 이어가면 좋습니다.",
   },
 ];

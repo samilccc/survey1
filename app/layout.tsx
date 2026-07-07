@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "복지일까, 투자일까 — 실시간 서베이",
+  title: "우리의 시간, 다시 디자인하다 — 실시간 서베이",
   description:
-    "IT·게임업계의 출산·육아 복지 트렌드를 통해 보는 조직문화와 리텐션의 변화. 대화 촉진형 실시간 관점 서베이.",
+    "우리 팀의 미팅과 몰입 시간을 ‘더 적은 부담 · 더 큰 가치’로 함께 설계하는 대화 촉진형 실시간 서베이.",
 };
 
 export const viewport: Viewport = {

@@ -32,6 +32,12 @@ const config: Config = {
         mist: "#F6F7FB",
         ink: "#14233F",
         muted: "#61708C",
+        // 밝고 산뜻한 액센트 / 표면
+        sky: "#38BDF8",
+        mint: "#2DD4BF",
+        lilac: "#A78BFA",
+        sun: "#FBBF24",
+        paper: "#F4F8FF",
       },
       fontFamily: {
         sans: [

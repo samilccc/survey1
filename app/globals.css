@@ -20,6 +20,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* 발표(호스트) 배경 — 딥블루를 유지하되 밝은 인디고 글로우로 산뜻하게 */
+.host-bg {
+  background-color: #0e1e44;
+  background-image: radial-gradient(
+      1100px 640px at 74% -12%,
+      #2f5bc0 0%,
+      rgba(30, 58, 138, 0.55) 34%,
+      rgba(14, 30, 68, 0) 72%
+    ),
+    radial-gradient(
+      900px 520px at 8% 108%,
+      rgba(45, 212, 191, 0.16) 0%,
+      rgba(14, 30, 68, 0) 60%
+    );
+}
+
 /* 접근성: 키보드 포커스 표시 */
 :focus-visible {
   outline: 3px solid #5c84ff;

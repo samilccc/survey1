@@ -780,7 +780,7 @@ function AnswerInput({
 // ===== 공용 레이아웃 요소 =====
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-[100dvh] overflow-x-hidden bg-cream">
+    <main className="min-h-[100dvh] overflow-x-hidden bg-paper">
       <div className="mx-auto w-full max-w-md px-5 py-6">{children}</div>
     </main>
   );

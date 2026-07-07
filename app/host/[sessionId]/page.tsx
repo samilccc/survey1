@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import { upsertLibrary } from "@/lib/hostLibrary";
 import {
   hostAction,
   useParticipants,
@@ -121,6 +122,13 @@ export default function HostPage() {
     }
   }, [sessionId]);
 
+  // 세션을 열 때마다 진행자 라이브러리에 기록(스택 누적)
+  useEffect(() => {
+    if (session && adminKey) {
+      upsertLibrary({ id: sessionId, key: adminKey, title: session.title });
+    }
+  }, [session?.id, session?.title, adminKey, sessionId]);
+
   const act = useCallback(
     async (action: string, payload?: unknown) => {
       if (!adminKey) return;
@@ -179,9 +187,16 @@ export default function HostPage() {
   // ===== 대기 화면 =====
   if (session.status === "waiting") {
     return (
-      <main ref={rootRef} className="boardroom min-h-screen bg-navy-950 text-white">
+      <main ref={rootRef} className="boardroom min-h-screen host-bg text-white">
         <div className="mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-8 py-12 lg:grid-cols-2">
           <div>
+            <a
+              href="/"
+              className="mb-5 inline-block text-xs font-semibold text-white/40 transition hover:text-white/75"
+            >
+              ← 전체 세션
+            </a>
+            <br />
             <span className="rounded-full bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/80">
               세션 대기 중 · 브리핑이 끝나면 시작하세요
             </span>
@@ -251,7 +266,7 @@ export default function HostPage() {
   const points = current ? slidePoints(current) : [];
 
   return (
-    <main ref={rootRef} className="boardroom flex min-h-screen flex-col bg-navy-950 pb-28 text-white">
+    <main ref={rootRef} className="boardroom flex min-h-screen flex-col host-bg pb-28 text-white">
       {/* 상단 바 */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-navy-950/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3">
@@ -462,7 +477,7 @@ export default function HostPage() {
 
 function Center({ children }: { children: React.ReactNode }) {
   return (
-    <main className="boardroom flex min-h-screen items-center justify-center bg-navy-950 px-6 text-center text-white/80">
+    <main className="boardroom flex min-h-screen items-center justify-center host-bg px-6 text-center text-white/80">
       <div>{children}</div>
     </main>
   );
@@ -535,7 +550,7 @@ function SummaryView({
   }, [sessionId]);
 
   return (
-    <main className="boardroom flex min-h-screen flex-col bg-navy-950 text-white">
+    <main className="boardroom flex min-h-screen flex-col host-bg text-white">
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-6 py-6">
         {/* 헤더 */}
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -546,6 +561,12 @@ function SummaryView({
             <h1 className="mt-2 truncate text-2xl font-extrabold">{title}</h1>
           </div>
           <div className="flex items-center gap-2">
+            <a
+              href="/"
+              className="rounded-xl bg-white/10 px-3 py-2 text-xs font-bold hover:bg-white/20"
+            >
+              ← 라이브러리
+            </a>
             <span className="rounded-full bg-white/10 px-3 py-1.5 text-sm font-semibold">
               참여 <b className="text-teal">{connected}</b>명
             </span>
