@@ -159,6 +159,7 @@ function ParticipantFlow({
   const [submitted, setSubmitted] = useState(false);
   const [draft, setDraft] = useState<Answer | null>(null);
   const [sending, setSending] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
 
   // 문항이 바뀌면 내 응답 상태 초기화 + 기존 응답 조회
   useEffect(() => {
@@ -201,6 +202,8 @@ function ParticipantFlow({
     }
     setMyAnswer(draft);
     setSubmitted(true);
+    setCelebrate(true);
+    setTimeout(() => setCelebrate(false), 1900);
   };
 
   // ----- 화면 분기 -----
@@ -292,6 +295,7 @@ function ParticipantFlow({
   if (submitted && !session.allow_response_edit) {
     return (
       <Shell>
+        {celebrate && <SubmitCelebration />}
         <ProgressBar idx={idx} total={questions.length} />
         <Centered>
           <Emoji>✓</Emoji>
@@ -313,6 +317,7 @@ function ParticipantFlow({
   const effectiveDraft = draft ?? (submitted ? myAnswer : null);
   return (
     <Shell>
+      {celebrate && <SubmitCelebration />}
       <ProgressBar idx={idx} total={questions.length} />
       <div className="animate-fade-up">
         <QuestionImage
@@ -654,9 +659,9 @@ function AnswerInput({
             <button
               key={i}
               onClick={() => onChange(i)}
-              className={`flex w-full items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-base font-semibold transition ${
+              className={`flex w-full items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-base font-semibold transition active:scale-[0.97] ${
                 selected
-                  ? "border-brand-500 bg-brand-500/10 text-brand-600"
+                  ? "border-brand-500 bg-brand-500/10 text-brand-600 animate-pop"
                   : "border-black/10 bg-white text-ink hover:border-brand-400"
               }`}
             >
@@ -689,9 +694,9 @@ function AnswerInput({
             <button
               key={s}
               onClick={() => onChange(s)}
-              className={`flex w-full items-center gap-3 rounded-2xl border-2 px-4 py-3.5 text-left transition ${
+              className={`flex w-full items-center gap-3 rounded-2xl border-2 px-4 py-3.5 text-left transition active:scale-[0.97] ${
                 selected
-                  ? "border-brand-500 bg-brand-500/10"
+                  ? "border-brand-500 bg-brand-500/10 animate-pop"
                   : "border-black/10 bg-white hover:border-brand-400"
               }`}
             >
@@ -737,9 +742,9 @@ function AnswerInput({
             <button
               key={i}
               onClick={() => toggle(i)}
-              className={`flex w-full items-center gap-3 rounded-2xl border-2 px-4 py-4 text-left text-base font-semibold transition ${
+              className={`flex w-full items-center gap-3 rounded-2xl border-2 px-4 py-4 text-left text-base font-semibold transition active:scale-[0.97] ${
                 selected
-                  ? "border-brand-500 bg-brand-500/10 text-brand-600"
+                  ? "border-brand-500 bg-brand-500/10 text-brand-600 animate-pop"
                   : "border-black/10 bg-white text-ink hover:border-brand-400"
               }`}
             >
@@ -761,18 +766,43 @@ function AnswerInput({
   }
 
   // free_text
+  const text = (value as string) ?? "";
   return (
     <div>
       <textarea
-        value={(value as string) ?? ""}
-        onChange={(e) => onChange(e.target.value.slice(0, 200))}
+        value={text}
+        onChange={(e) => onChange(e.target.value.slice(0, 500))}
         placeholder={question.free_text_placeholder ?? "자유롭게 입력해주세요"}
-        rows={4}
-        className="w-full resize-none rounded-2xl border-2 border-black/10 px-4 py-3 text-base leading-relaxed outline-none focus:border-brand-500"
+        rows={6}
+        className="min-h-[9rem] w-full resize-y rounded-2xl border-2 border-black/10 px-4 py-3.5 text-base leading-relaxed outline-none transition focus:border-brand-500 focus:bg-brand-500/[0.03]"
       />
-      <p className="mt-1 text-right text-xs text-muted">
-        {((value as string) ?? "").length}/200
-      </p>
+      <div className="mt-1.5 flex items-center justify-between text-xs">
+        <span className="text-brand-500">길게 적으셔도 좋아요 ✍️ 당신의 생각이 소중해요</span>
+        <span className="text-muted">{text.length}/500</span>
+      </div>
+    </div>
+  );
+}
+
+// 제출 축하 연출 — "내 의견이 소중하다"는 느낌의 짧은 애니메이션
+function SubmitCelebration() {
+  const bits = ["💛", "✨", "⭐", "🎉", "💫", "💛", "✨", "⭐"];
+  return (
+    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+      {bits.map((b, i) => (
+        <span
+          key={i}
+          className="absolute bottom-28 animate-float-up text-3xl"
+          style={{ left: `${7 + i * 11}%`, animationDelay: `${i * 90}ms` }}
+        >
+          {b}
+        </span>
+      ))}
+      <div className="absolute inset-x-0 top-1/3 flex justify-center px-6">
+        <div className="animate-pop-in rounded-full bg-white px-6 py-3 text-center text-base font-extrabold text-brand-600 shadow-xl ring-1 ring-brand-500/20">
+          당신의 의견은 소중해요 💛
+        </div>
+      </div>
     </div>
   );
 }

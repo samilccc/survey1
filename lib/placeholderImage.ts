@@ -13,10 +13,10 @@ const ICONS: Record<number, string> = {
   4: `<circle cx='36' cy='44' r='10'/><circle cx='64' cy='44' r='10'/><path d='M22 72 q14 -15 28 0'/><path d='M50 72 q14 -15 28 0'/><circle cx='50' cy='40' r='3.5' fill='ACCENT' stroke='none'/>`,
   // 5. 캘린더 — 수요일 주기
   5: `<rect x='24' y='28' width='52' height='46' rx='6'/><path d='M24 41 H76'/><path d='M37 22 V32 M63 22 V32'/><circle cx='40' cy='53' r='3' fill='ACCENT' stroke='none'/><circle cx='52' cy='53' r='3' fill='#fff' stroke='none'/><circle cx='64' cy='53' r='3' fill='#fff' stroke='none'/><circle cx='40' cy='64' r='3' fill='#fff' stroke='none'/><circle cx='52' cy='64' r='3' fill='ACCENT' stroke='none'/>`,
-  // 6. 전구 — 새로운 시도
-  6: `<path d='M50 24 a18 18 0 0 1 12 31 c-3 3 -4 5 -4 9 H42 c0 -4 -1 -6 -4 -9 a18 18 0 0 1 12 -31 Z'/><path d='M43 72 h14 M46 78 h8'/><path d='M50 42 v9 M45 47 h10' stroke='ACCENT'/>`,
-  // 7. 과녁 — 나의 몰입 시간
-  7: `<circle cx='50' cy='50' r='30'/><circle cx='50' cy='50' r='18'/><circle cx='50' cy='50' r='6' fill='ACCENT' stroke='none'/>`,
+  // 6. 저울 — 연결 vs 효율
+  6: `<path d='M50 24 V70 M38 72 H62 M28 34 H72'/><path d='M28 34 L22 50 a8 8 0 0 0 12 0 Z'/><path d='M72 34 L66 50 a8 8 0 0 0 12 0 Z'/><circle cx='50' cy='28' r='3.5' fill='ACCENT' stroke='none'/>`,
+  // 7. 말풍선+전구 — 나의 아이디어
+  7: `<path d='M24 30 H70 a7 7 0 0 1 7 7 V57 a7 7 0 0 1 -7 7 H44 L32 74 V64 H24 a7 7 0 0 1 -7 -7 V37 a7 7 0 0 1 7 -7 Z'/><path d='M47 40 a7 7 0 0 1 5 12 c-1 1 -1.5 2 -1.5 3.5 h-7 c0 -1.5 -.5 -2.5 -1.5 -3.5 a7 7 0 0 1 5 -12 Z' stroke='ACCENT'/>`,
   // 8. 종+진동 — 무엇이 끊는가
   8: `<path d='M50 26 a13 13 0 0 0 -13 13 v8 l-5 8 h36 l-5 -8 v-8 a13 13 0 0 0 -13 -13 Z'/><path d='M45 63 a5 5 0 0 0 10 0'/><path d='M71 34 l6 -4 M73 46 l7 0 M71 58 l6 4' stroke='ACCENT'/>`,
   // 9. 방패+체크 — 몰입을 지키는 법
@@ -30,11 +30,11 @@ const ICONS: Record<number, string> = {
 const KEYWORDS: Record<number, string> = {
   1: "우리의 미팅 리듬",
   2: "더 낫게 만들기",
-  3: "지키고 싶은 시간",
+  3: "가장 도움이 되는",
   4: "얼굴을 보는 가치",
   5: "수요일, 어떻게?",
-  6: "새로운 시도",
-  7: "나의 몰입 시간",
+  6: "연결 vs 효율",
+  7: "나의 아이디어",
   8: "무엇이 끊는가",
   9: "몰입을 지키는 법",
   10: "연결 vs 효율",
@@ -77,7 +77,7 @@ export function placeholderDataUri(order: number, label?: string): string {
   <rect width='1600' height='900' fill='url(#${idA})'/>
   <rect width='1600' height='900' fill='url(#${idB})'/>
   <circle cx='250' cy='770' r='250' fill='#ffffff' opacity='0.07'/>
-  <text x='112' y='150' font-family='Pretendard, sans-serif' font-size='30' letter-spacing='6' font-weight='700' fill='#ffffff' opacity='0.7'>우리의 시간 · ${safe} / 11</text>
+  <text x='112' y='150' font-family='Pretendard, sans-serif' font-size='30' letter-spacing='6' font-weight='700' fill='#ffffff' opacity='0.7'>우리의 시간 · ${safe} / 7</text>
   <g transform='translate(620,150) scale(3.6)' fill='none' stroke='#ffffff' stroke-width='4.2' stroke-linecap='round' stroke-linejoin='round'>${icon}</g>
   <text x='800' y='700' text-anchor='middle' font-family='Pretendard, sans-serif' font-size='62' font-weight='800' fill='#ffffff' opacity='0.98'>${keyword}</text>
   <rect x='700' y='742' width='200' height='6' rx='3' fill='${accent}'/>

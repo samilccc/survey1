@@ -16,6 +16,7 @@ import { buildCsv, buildJson, downloadText } from "@/lib/export";
 import type { Participant, Question, Response } from "@/lib/types";
 import QRDisplay from "@/components/QRDisplay";
 import ResultChart from "@/components/charts/ResultChart";
+import { resolveGuide } from "@/lib/dialogueGuide";
 
 const TYPE_KO: Record<string, string> = {
   single_choice: "단일 선택",
@@ -421,6 +422,20 @@ export default function HostPage() {
                 <ResultChart question={current} responses={responses} dark />
               </div>
               <p className="mt-3 text-center text-xs text-white/40">총 {responded}명 응답</p>
+              <DialogueGuideCard question={current} responses={responses} />
+            </div>
+          )}
+
+          {/* 다음 문항 미리보기 — 지금은 현재 문항에만 집중하도록 */}
+          {questions[idx + 1] && (
+            <div className="mt-8 flex items-center justify-center gap-2 text-sm text-white/40">
+              <span className="rounded-full bg-white/8 px-2.5 py-1 text-xs font-bold text-white/55">
+                다음
+              </span>
+              <span className="max-w-md truncate">{questions[idx + 1].title}</span>
+              <span className="hidden text-xs text-white/25 sm:inline">
+                · 지금은 이 문항에만 집중해요
+              </span>
             </div>
           )}
         </section>
@@ -472,6 +487,57 @@ export default function HostPage() {
         </div>
       </footer>
     </main>
+  );
+}
+
+function GuideBlock({
+  label,
+  text,
+  quote = false,
+}: {
+  label: string;
+  text: string;
+  quote?: boolean;
+}) {
+  return (
+    <div className="rounded-xl2 bg-white/[0.06] p-4 ring-1 ring-white/10">
+      <div className="mb-1.5 text-xs font-bold uppercase tracking-wide text-teal">
+        {label}
+      </div>
+      <p
+        className={`break-keep text-[15px] leading-relaxed md:text-base ${
+          quote ? "italic text-white/80" : "font-medium text-white/90"
+        }`}
+      >
+        {text}
+      </p>
+    </div>
+  );
+}
+
+function DialogueGuideCard({
+  question,
+  responses,
+}: {
+  question: Question;
+  responses: Response[];
+}) {
+  const g = resolveGuide(question, responses);
+  if (!g) return null;
+  return (
+    <div className="mt-6 animate-fade-up rounded-xl2 bg-gradient-to-br from-brand-500/18 via-white/[0.04] to-teal/12 p-5 ring-1 ring-white/10 md:p-7">
+      <div className="mb-4 flex items-center gap-2">
+        <span aria-hidden className="text-lg">💬</span>
+        <h3 className="text-sm font-extrabold uppercase tracking-wider text-teal">
+          함께 나눠볼 대화 가이드
+        </h3>
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        <GuideBlock label="이 결과가 말하는 것" text={g.direction} />
+        <GuideBlock label="팀원들의 속마음" text={g.sentiment} quote />
+        <GuideBlock label="함께 얘기해볼까요" text={g.prompt} />
+      </div>
+    </div>
   );
 }
 
