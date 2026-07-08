@@ -784,24 +784,30 @@ function AnswerInput({
   );
 }
 
-// 제출 축하 연출 — "내 의견이 소중하다"는 느낌의 짧은 애니메이션
+// 제출 확인 연출 — 절제되고 정숙한 확인(부드러운 링 + 체크 + 담백한 문구)
 function SubmitCelebration() {
-  const bits = ["💛", "✨", "⭐", "🎉", "💫", "💛", "✨", "⭐"];
   return (
-    <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
-      {bits.map((b, i) => (
-        <span
-          key={i}
-          className="absolute bottom-28 animate-float-up text-3xl"
-          style={{ left: `${7 + i * 11}%`, animationDelay: `${i * 90}ms` }}
-        >
-          {b}
-        </span>
-      ))}
-      <div className="absolute inset-x-0 top-1/3 flex justify-center px-6">
-        <div className="animate-pop-in rounded-full bg-white px-6 py-3 text-center text-base font-extrabold text-brand-600 shadow-xl ring-1 ring-brand-500/20">
-          당신의 의견은 소중해요 💛
+    <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-6">
+      <div className="animate-confirm-fade flex flex-col items-center">
+        <div className="relative flex h-20 w-20 items-center justify-center">
+          <span className="absolute inset-0 animate-ring-out rounded-full ring-2 ring-brand-500/40" />
+          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-500/10 ring-1 ring-brand-500/20">
+            <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none">
+              <path
+                d="M5 12.5 L10 17.5 L19 7"
+                stroke="#2563EB"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="animate-check-draw"
+                pathLength={1}
+              />
+            </svg>
+          </span>
         </div>
+        <p className="mt-5 text-sm font-semibold tracking-wide text-navy-700">
+          응답이 기록되었습니다
+        </p>
       </div>
     </div>
   );

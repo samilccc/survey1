@@ -342,24 +342,40 @@ export default function HostPage() {
 
       {/* 슬라이드 본문 */}
       {current && (
-        <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 py-8">
-          <div className="flex items-center justify-center gap-3 text-sm font-semibold">
-            <span className="rounded-full bg-brand-500/20 px-3 py-1 text-brand-400">
-              문항 {idx + 1} / {questions.length}
-            </span>
-            <span className="uppercase tracking-wider text-white/40">
-              {TYPE_KO[current.type] ?? current.type}
-            </span>
+        <section className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center px-6 py-8">
+          <div className="flex items-start justify-between gap-8">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-3 text-sm font-semibold">
+                <span className="rounded-full bg-brand-500/20 px-3 py-1 text-brand-400">
+                  문항 {idx + 1} / {questions.length}
+                </span>
+                <span className="uppercase tracking-wider text-white/40">
+                  {TYPE_KO[current.type] ?? current.type}
+                </span>
+              </div>
+              <h2 className="mt-4 text-balance text-4xl font-extrabold leading-tight md:text-5xl">
+                {current.title}
+              </h2>
+              {current.short_context && (
+                <p className="mt-4 max-w-2xl text-pretty text-lg leading-relaxed text-white/60">
+                  {current.short_context}
+                </p>
+              )}
+            </div>
+            {questions[idx + 1] && (
+              <div className="hidden w-60 shrink-0 self-stretch border-l border-white/10 pl-6 lg:block">
+                <div className="text-xs font-bold uppercase tracking-wider text-white/40">
+                  다음 문항
+                </div>
+                <p className="mt-2 line-clamp-5 text-lg font-semibold leading-snug text-white/25">
+                  {questions[idx + 1].title}
+                </p>
+                <div className="mt-2 text-xs text-white/20">
+                  {TYPE_KO[questions[idx + 1].type] ?? ""}
+                </div>
+              </div>
+            )}
           </div>
-
-          <h2 className="mt-5 text-balance text-center text-4xl font-extrabold leading-tight md:text-5xl">
-            {current.title}
-          </h2>
-          {current.short_context && (
-            <p className="mx-auto mt-4 max-w-3xl text-pretty text-center text-lg leading-relaxed text-white/60">
-              {current.short_context}
-            </p>
-          )}
 
           {!session.is_result_visible ? (
             <div className="mt-10 grid items-start gap-7 lg:grid-cols-5">
@@ -423,19 +439,6 @@ export default function HostPage() {
               </div>
               <p className="mt-3 text-center text-xs text-white/40">총 {responded}명 응답</p>
               <DialogueGuideCard question={current} responses={responses} />
-            </div>
-          )}
-
-          {/* 다음 문항 미리보기 — 지금은 현재 문항에만 집중하도록 */}
-          {questions[idx + 1] && (
-            <div className="mt-8 flex items-center justify-center gap-2 text-sm text-white/40">
-              <span className="rounded-full bg-white/8 px-2.5 py-1 text-xs font-bold text-white/55">
-                다음
-              </span>
-              <span className="max-w-md truncate">{questions[idx + 1].title}</span>
-              <span className="hidden text-xs text-white/25 sm:inline">
-                · 지금은 이 문항에만 집중해요
-              </span>
             </div>
           )}
         </section>

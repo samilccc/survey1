@@ -81,6 +81,20 @@ const config: Config = {
           "20%": { opacity: "1" },
           "100%": { opacity: "0", transform: "translateY(-120px) scale(1.15)" },
         },
+        "confirm-fade": {
+          "0%": { opacity: "0", transform: "translateY(6px)" },
+          "16%": { opacity: "1", transform: "translateY(0)" },
+          "82%": { opacity: "1", transform: "translateY(0)" },
+          "100%": { opacity: "0", transform: "translateY(-4px)" },
+        },
+        "ring-out": {
+          "0%": { opacity: "0.55", transform: "scale(0.55)" },
+          "100%": { opacity: "0", transform: "scale(1.7)" },
+        },
+        "check-draw": {
+          "0%": { strokeDasharray: "1", strokeDashoffset: "1" },
+          "100%": { strokeDasharray: "1", strokeDashoffset: "0" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.5s cubic-bezier(0.16,1,0.3,1) both",
@@ -89,6 +103,9 @@ const config: Config = {
         pop: "pop 0.4s cubic-bezier(0.16,1,0.3,1) both",
         "pop-in": "pop-in 0.45s cubic-bezier(0.16,1,0.3,1) both",
         "float-up": "float-up 1.8s ease-out forwards",
+        "confirm-fade": "confirm-fade 1.9s ease both",
+        "ring-out": "ring-out 0.9s ease-out both",
+        "check-draw": "check-draw 0.5s ease 0.15s both",
       },
     },
   },
