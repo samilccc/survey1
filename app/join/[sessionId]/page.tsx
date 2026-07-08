@@ -159,7 +159,6 @@ function ParticipantFlow({
   const [submitted, setSubmitted] = useState(false);
   const [draft, setDraft] = useState<Answer | null>(null);
   const [sending, setSending] = useState(false);
-  const [celebrate, setCelebrate] = useState(false);
 
   // 문항이 바뀌면 내 응답 상태 초기화 + 기존 응답 조회
   useEffect(() => {
@@ -202,8 +201,6 @@ function ParticipantFlow({
     }
     setMyAnswer(draft);
     setSubmitted(true);
-    setCelebrate(true);
-    setTimeout(() => setCelebrate(false), 1900);
   };
 
   // ----- 화면 분기 -----
@@ -295,10 +292,9 @@ function ParticipantFlow({
   if (submitted && !session.allow_response_edit) {
     return (
       <Shell>
-        {celebrate && <SubmitCelebration />}
         <ProgressBar idx={idx} total={questions.length} />
         <Centered>
-          <Emoji>✓</Emoji>
+          <AnimatedCheck />
           <h2 className="mt-4 text-xl font-extrabold text-ink">응답이 제출되었습니다</h2>
           <p className="mt-2 text-muted">
             진행자가 결과를 공개하면 이 화면에서 바로 확인할 수 있어요.
@@ -317,7 +313,6 @@ function ParticipantFlow({
   const effectiveDraft = draft ?? (submitted ? myAnswer : null);
   return (
     <Shell>
-      {celebrate && <SubmitCelebration />}
       <ProgressBar idx={idx} total={questions.length} />
       <div className="animate-fade-up">
         <QuestionImage
@@ -784,31 +779,24 @@ function AnswerInput({
   );
 }
 
-// 제출 확인 연출 — 절제되고 정숙한 확인(부드러운 링 + 체크 + 담백한 문구)
-function SubmitCelebration() {
+// 제출 완료 화면 상단의 체크 아이콘 (은은한 링 + 체크 그리기, 오버레이 아님)
+function AnimatedCheck() {
   return (
-    <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-6">
-      <div className="animate-confirm-fade flex flex-col items-center">
-        <div className="relative flex h-20 w-20 items-center justify-center">
-          <span className="absolute inset-0 animate-ring-out rounded-full ring-2 ring-brand-500/40" />
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-500/10 ring-1 ring-brand-500/20">
-            <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none">
-              <path
-                d="M5 12.5 L10 17.5 L19 7"
-                stroke="#2563EB"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="animate-check-draw"
-                pathLength={1}
-              />
-            </svg>
-          </span>
-        </div>
-        <p className="mt-5 text-sm font-semibold tracking-wide text-navy-700">
-          응답이 기록되었습니다
-        </p>
-      </div>
+    <div className="relative mx-auto flex h-20 w-20 items-center justify-center">
+      <span className="absolute inset-0 animate-ring-out rounded-full ring-2 ring-brand-500/40" />
+      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-500/10 ring-1 ring-brand-500/20">
+        <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none">
+          <path
+            d="M5 12.5 L10 17.5 L19 7"
+            stroke="#2563EB"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="animate-check-draw"
+            pathLength={1}
+          />
+        </svg>
+      </span>
     </div>
   );
 }
